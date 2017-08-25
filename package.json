@@ -1,0 +1,21 @@
+{
+  "name": "thingy-gateway",
+  "version": "0.0.1",
+  "description": "Nordic Thingy:52 Node.js gateway",
+  "main": "environment_multi.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DurandA/thingy-gateway.git"
+  },
+  "keywords": [],
+  "author": "Arnaud Durand",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DurandA/thingy-gateway/issues"
+  },
+  "homepage": "https://github.com/DurandA/thingy-gateway#readme",
+  "dependencies": {
+    "thingy52": "^1.0.1",
+    "yargs": "^8.0.2"
+  }
+}

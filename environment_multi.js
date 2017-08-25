@@ -30,6 +30,15 @@
  */
 
 var Thingy = require('thingy52');
+const argv = require('yargs').argv
+
+var ids = []
+
+if (argv.id) {
+    ids = ids.concat(argv.id).map(function(e) {
+        return e.replace(/:/g,'').toLowerCase();
+    })
+}
 
 console.log('Reading Thingy environment sensors!');
 
@@ -98,7 +107,7 @@ function onButtonChange(state) {
 }
 
 function onDiscover(thingy) {
-  //console.log('Discovered: ' + thingy);
+  console.log('Discovered: ' + thingy);
 
   thingy.on('disconnect', function() {
     console.log('Disconnected!');
@@ -163,8 +172,6 @@ function onDiscover(thingy) {
   });
 }
 
-ids = new Set(['cfe137a13701', 'c346e4882b11']);
-
 function* discoverByIds(ids) {
   for (var id of ids) {
     yield new Promise((resolve, reject) => {
@@ -176,11 +183,16 @@ function* discoverByIds(ids) {
   }
 }
 
-Promise.all(discoverByIds(ids)).then(devices => {
-  console.log('Discovered all devices!');
-  for (var thingy of devices) {
-    onDiscover(thingy);
-  }
-});
-
-//Thingy.discover(onDiscover);
+if (ids && ids.length){
+    Promise.all(discoverByIds(ids)).then(devices => {
+      console.log('Discovered all devices!');
+      for (var thingy of devices) {
+        onDiscover(thingy);
+      }
+    });
+} else {
+    Thingy.discoverAll(function (thingy){
+        console.log('Discovered: ' + thingy);
+        onDiscover(thingy)}
+    );
+}
