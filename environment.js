@@ -65,6 +65,34 @@ function onColorData(color) {
                              ' c ' + color.clear );
 }
 
+function setup(settings){
+    thingy.temperature_interval_set(settings.temperature.interval, function(error) {
+        if (error) {
+            console.log('Temperature sensor configure! ' + error);
+        }
+    });
+    thingy.pressure_interval_set(settings.pressure.interval, function(error) {
+        if (error) {
+            console.log('Pressure sensor configure! ' + error);
+        }
+    });
+    thingy.humidity_interval_set(settings.humidity.interval, function(error) {
+        if (error) {
+            console.log('Humidity sensor configure! ' + error);
+        }
+    });
+    thingy.color_interval_set(settings.color.interval, function(error) {
+        if (error) {
+            console.log('Color sensor configure! ' + error);
+        }
+    });
+    thingy.gas_mode_set(settings.gas.mode, function(error) {
+        if (error) {
+            console.log('Gas sensor configure! ' + error);
+        }
+    });
+}
+
 function onButtonChange(state) {
     if (state == 'Pressed') {
         if (this.enabled) {
@@ -123,31 +151,8 @@ function onDiscover(thingy) {
     thingy.on('colorNotif', onColorData);
     thingy.on('buttonNotif', onButtonChange);
 
-    thingy.temperature_interval_set(1000, function(error) {
-        if (error) {
-            console.log('Temperature sensor configure! ' + error);
-        }
-    });
-    thingy.pressure_interval_set(1000, function(error) {
-        if (error) {
-            console.log('Pressure sensor configure! ' + error);
-        }
-    });
-    thingy.humidity_interval_set(1000, function(error) {
-        if (error) {
-            console.log('Humidity sensor configure! ' + error);
-        }
-    });
-    thingy.color_interval_set(1000, function(error) {
-        if (error) {
-            console.log('Color sensor configure! ' + error);
-        }
-    });
-    thingy.gas_mode_set(1, function(error) {
-        if (error) {
-            console.log('Gas sensor configure! ' + error);
-        }
-    });
+    var setup = setup.bind(thingy);
+    //client.getSettings
 
     thingy.enabled = true;
 
