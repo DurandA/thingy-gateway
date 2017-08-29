@@ -31,6 +31,8 @@
 
 var Thingy = require('thingy52');
 const argv = require('yargs').argv
+var client = require('./client')('http://127.0.0.1:8080');
+
 
 var ids = []
 
@@ -66,27 +68,27 @@ function onColorData(color) {
 }
 
 function setup(settings){
-    thingy.temperature_interval_set(settings.temperature.interval, function(error) {
+    this.temperature_interval_set(settings.temperature.interval, function(error) {
         if (error) {
             console.log('Temperature sensor configure! ' + error);
         }
     });
-    thingy.pressure_interval_set(settings.pressure.interval, function(error) {
+    this.pressure_interval_set(settings.pressure.interval, function(error) {
         if (error) {
             console.log('Pressure sensor configure! ' + error);
         }
     });
-    thingy.humidity_interval_set(settings.humidity.interval, function(error) {
+    this.humidity_interval_set(settings.humidity.interval, function(error) {
         if (error) {
             console.log('Humidity sensor configure! ' + error);
         }
     });
-    thingy.color_interval_set(settings.color.interval, function(error) {
+    this.color_interval_set(settings.color.interval, function(error) {
         if (error) {
             console.log('Color sensor configure! ' + error);
         }
     });
-    thingy.gas_mode_set(settings.gas.mode, function(error) {
+    this.gas_mode_set(settings.gas.mode, function(error) {
         if (error) {
             console.log('Gas sensor configure! ' + error);
         }
@@ -144,15 +146,15 @@ function onDiscover(thingy) {
   thingy.connectAndSetUp(function(error) {
     console.log('Connected! ' + error ? error : '');
 
-    thingy.on('temperatureNotif', onTemperatureData);
-    thingy.on('pressureNotif', onPressureData);
-    thingy.on('humidityNotif', onHumidityData);
-    thingy.on('gasNotif', onGasData);
-    thingy.on('colorNotif', onColorData);
-    thingy.on('buttonNotif', onButtonChange);
+    thingy.on('temperatureNotif', client.sendTemperature.bind(thingy)/*onTemperatureData*/);
+    thingy.on('pressureNotif', client.sendPressure.bind(thingy)/*onPressureData*/);
+    thingy.on('humidityNotif', client.sendHumidity.bind(thingy)/*onHumidityData*/);
+    thingy.on('gasNotif', client.sendGas.bind(thingy)/*onGasData*/);
+    thingy.on('colorNotif', client.sendColor.bind(thingy)/*onColorData*/);
+    thingy.on('buttonNotif', client.setButton.bind(thingy)/*onButtonChange*/);
 
-    var setup = setup.bind(thingy);
-    //client.getSettings
+    client.getSettings.call(thingy).on('complete', setup.bind(thingy));
+    setInterval(() => client.getLed.call(thingy).on('complete', thingy.led_breathe.bind(thingy)), 1000);
 
     thingy.enabled = true;
 
