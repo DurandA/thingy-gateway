@@ -29,20 +29,8 @@
   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-var Thingy = require('thingy52');
-const argv = require('yargs').argv
-var client = require('./client')('http://127.0.0.1:8080');
 
-
-var ids = []
-
-if (argv.id) {
-    ids = ids.concat(argv.id).map(function(e) {
-        return e.replace(/:/g,'').toLowerCase();
-    })
-}
-
-console.log('Reading Thingy environment sensors!');
+var client;
 
 function onTemperatureData(temperature) {
     console.log('Temperature sensor: ' + temperature);
@@ -179,27 +167,10 @@ function onDiscover(thingy) {
   });
 }
 
-function* discoverByIds(ids) {
-  for (var id of ids) {
-    yield new Promise((resolve, reject) => {
-      Thingy.discoverById(id, function(thingy) {
-          console.log('Discovered: ' + thingy);
-          resolve(thingy);
-      });
-    });
-  }
-}
-
-if (ids && ids.length){
-    Promise.all(discoverByIds(ids)).then(devices => {
-      console.log('Discovered all devices!');
-      for (var thingy of devices) {
-        onDiscover(thingy);
-      }
-    });
-} else {
-    Thingy.discoverAll(function (thingy){
-        console.log('Discovered: ' + thingy);
-        onDiscover(thingy)}
-    );
-}
+module.exports = function(_client) {
+    var module = {};
+    console.log('Reading Thingy environment sensors!');
+    client = _client;
+    module.onDiscover = onDiscover;
+    return module;
+};
