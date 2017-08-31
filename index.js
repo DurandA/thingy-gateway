@@ -1,20 +1,16 @@
 var Thingy = require('thingy52');
-const argv = require('yargs').argv
-var client = require('./client')('http://127.0.0.1:8080');
-var events = require('./environment')(client);
+/*var client = require('./client')('http://127.0.0.1:8080');
+var events = require('./events')(client);*/
 
-var ids = []
-
-if (argv.id) {
-    ids = ids.concat(argv.id).map(function(e) {
-        return e.replace(/:/g,'').toLowerCase();
-    })
+var events = function (api_root) {
+    var client = require('./client')(api_root);
+    return require('./events')(client);
 }
 
-function* discoverByIds(ids) {
-  for (var id of ids) {
+function* discoverByIds(uuids) {
+  for (var uuid of uuids) {
     yield new Promise((resolve, reject) => {
-      Thingy.discoverById(id, function(thingy) {
+      Thingy.discoverById(uuid, function(thingy) {
           console.log('Discovered: ' + thingy);
           resolve(thingy);
       });
@@ -22,16 +18,26 @@ function* discoverByIds(ids) {
   }
 }
 
-if (ids && ids.length){
-    Promise.all(discoverByIds(ids)).then(devices => {
-      console.log('Discovered all devices!');
-      for (var thingy of devices) {
-        events.onDiscover(thingy);
-      }
-    });
-} else {
-    Thingy.discoverAll(function (thingy){
-        console.log('Discovered: ' + thingy);
-        events.onDiscover(thingy)}
-    );
-}
+const argv = require('yargs')
+    .command('connect <api_root> [uuids..]', 'connect to device(s) with specified [uuids..] (= MACs) and connect to <api_root>', {}, (argv) => {
+        var uuids = []
+        uuids = argv.uuids.map(function(e) {
+            return e.toString().replace(/:/g,'').toLowerCase();
+        })
+        console.log('Search for device UUIDs: '+uuids);
+
+        Promise.all(discoverByIds(uuids)).then(devices => {
+          console.log('Discovered all devices!');
+          for (var thingy of devices) {
+            events(argv.api_root).onDiscover(thingy);
+          }
+        });
+    })
+    .command('discover <api_root>', 'discover all devices and connect to <api_root>', {}, (argv) => {
+        Thingy.discoverAll(function (thingy){
+            console.log('Discovered: ' + thingy);
+            events(argv.api_root).onDiscover(thingy)}
+        );
+    })
+    .help()
+    .argv
