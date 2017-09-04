@@ -124,7 +124,7 @@ function onButtonChange(state) {
     }
 }
 
-function onDiscover(thingy) {
+function onDiscover(thingy, enableEventSource = false) {
   console.log('Discovered: ' + thingy);
 
   thingy.on('disconnect', function() {
@@ -142,8 +142,13 @@ function onDiscover(thingy) {
     thingy.on('buttonNotif', client.setButton.bind(thingy)/*onButtonChange*/);
 
     client.getSettings.call(thingy).on('complete', setup.bind(thingy));
-    setInterval(() => client.getLed.call(thingy).on('complete', thingy.led_breathe.bind(thingy)), 1000);
-
+    if (enableEventSource) {
+        client.getLedSource.call(thingy, function (e) {
+            thingy.led_breathe(JSON.parse(e.data));
+        });
+    } else {
+        setInterval(() => client.getLed.call(thingy).on('complete', thingy.led_breathe.bind(thingy)), 1000);
+    }
     thingy.enabled = true;
 
     thingy.temperature_enable(function(error) {
@@ -167,10 +172,10 @@ function onDiscover(thingy) {
   });
 }
 
-module.exports = function(_client) {
+module.exports = function(_client, enableEventSource = false) {
     var module = {};
     console.log('Reading Thingy environment sensors!');
     client = _client;
-    module.onDiscover = onDiscover;
+    module.onDiscover = onDiscover.bind({enableEventSource: enableEventSource});
     return module;
 };

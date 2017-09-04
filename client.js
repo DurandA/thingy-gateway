@@ -1,5 +1,6 @@
 //Example POST method invocation
 var rest = require('restler');
+var EventSource = require('eventsource');
 
 module.exports = function(base_uri) {
 	var module = {};
@@ -48,6 +49,12 @@ module.exports = function(base_uri) {
 	module.getLed = function () {
 		return rest.get(base_uri+'/'+this.id+'/actuators/led');
 	};
+
+	module.getLedSource = function (onmessage, onerror) {
+		var source = new EventSource(base_uri+'/'+this.id+'/actuators/led');
+		source.onmessage = onmessage;
+		if (onerror) source.onerror = onerror;
+	}
 
 	return module;
 };
