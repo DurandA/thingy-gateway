@@ -2,6 +2,16 @@
 
 Nordic Thingy:52 Node.js gateway. Please see http://www.nordicsemi.com/thingy for the latest Nordic Thingy:52 news and software releases.
 
+## Installation
+
+Before installing *thingy-gateway*, make sure that you have Node.js >= 8. You can check which version of Node.js is installed with `node --version` or `nodejs --version`.
+
+```
+git clone https://github.com/DurandA/thingy-gateway
+cd thingy-gateway
+npm install
+```
+
 ## Usage
 
 ```
@@ -40,11 +50,13 @@ Options:
 ```
 
 ## Troubleshooting
-### Check that Thingy is detected with BLE scan
+
+### The gateway cannot connect to the BLE device
+* Check that Thingy is detected with BLE scan
 ```
 sudo hcitool lescan
 ```
-### Check that the Bluetooth controller is not blocked
+* Check that the Bluetooth controller is not blocked
 ```
 sudo hcitool dev
 sudo rfkill list all
@@ -57,7 +69,7 @@ The following output show a blocked controller:
 ```
 You can unblock *hci0* with `sudo rfkill unblock 0`.
 
-### Bluetooth control tool
+## Bluetooth control tool cheatsheet
 Use `bluetoothctl` CLI to:
 * List available controllers (`list`)
 * Controller information (`show [ctrl]`)
