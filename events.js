@@ -144,7 +144,13 @@ function onDiscover(thingy, enableEventSource = false) {
     client.getSettings.call(thingy).on('complete', setup.bind(thingy));
     if (enableEventSource) {
         client.getLedSource.call(thingy, function (e) {
-            thingy.led_breathe(JSON.parse(e.data));
+            var data = JSON.parse(e.data);
+            if ('delay' in data)
+                thingy.led_breathe(data);
+            else if ('color' in data)
+                thingy.led_one_shot(data);
+            else
+                thingy.led_set(data);
         });
     } else {
         setInterval(() => client.getLed.call(thingy).on('complete', thingy.led_breathe.bind(thingy)), 1000);
