@@ -17,7 +17,7 @@
   "dependencies": {
     "eventsource": "^1.0.5",
     "restler": "^3.4.0",
-    "thingy52": "^1.0.1",
+    "thingy52": "^1.0.4",
     "yargs": "^8.0.2"
   }
 }
