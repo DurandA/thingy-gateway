@@ -63,6 +63,25 @@ The following output show a blocked controller:
 You can unblock *hci0* with `sudo rfkill unblock 0`.
 * If `noble warning: adapter state unauthorized, please run as root or with sudo` is displayed, prefix the command with `sudo`
 
+### The VirtualBox machine cannot connect to the host machine
+* Check that your machine network adapter is attached to NAT
+![NAT adapter](http://i64.tinypic.com/2ppeozn.jpg)
+* Find the IP address of your host machine using `ifconfig` on Linux or `ìpconfig` on Windows. On Windows you can use IP from the *VirtualBox Host-Only* interface.
+* Ping your host machine from the VM using `ping` (i.e. `ping 134.21.163.81`)
+```
+PING 134.21.163.81 (134.21.163.81) 56(84) bytes of data.
+64 bytes from 134.21.163.81: icmp_seq=1 ttl=64 time=0.090 ms
+64 bytes from 134.21.163.81: icmp_seq=2 ttl=64 time=0.067 ms
+64 bytes from 134.21.163.81: icmp_seq=3 ttl=64 time=0.037 ms
+```
+* Make sure that your HTTP server is listening on **all interfaces** by binding it to `0.0.0.0`
+```
+server.connection({
+    host: '0.0.0.0',
+    port: 8080,
+});
+```
+
 ## Bluetooth control tool cheatsheet
 Use `bluetoothctl` CLI to:
 * List available controllers (`list`)
