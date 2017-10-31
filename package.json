@@ -16,6 +16,7 @@
   "homepage": "https://github.com/DurandA/thingy-gateway#readme",
   "dependencies": {
     "eventsource": "^1.0.5",
+    "parse-headers": "^2.0.1",
     "restler": "^3.4.0",
     "thingy52": "^1.0.4",
     "yargs": "^8.0.2"

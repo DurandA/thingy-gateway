@@ -2,8 +2,8 @@ var Thingy = require('thingy52');
 /*var client = require('./client')('http://127.0.0.1:8080');
 var events = require('./events')(client);*/
 
-var events = function (api_root) {
-    var client = require('./client')(api_root);
+var events = function (api_root, headers = {}) {
+    var client = require('./client')(api_root, headers);
     return require('./events')(client);
 }
 
@@ -27,6 +27,15 @@ builder = (yargs) => {
     describe: 'enable server-sent events',
     default: false
   })
+  yargs.option('header', {
+    alias: 'H',
+    describe: 'pass custom header(s) to server',
+    type: 'array',
+    coerce: function (arg) {
+      var parse = require('parse-headers')
+      return parse(arg.join('\n'))
+    }
+  })
 }
 
 const argv = require('yargs')
@@ -40,15 +49,15 @@ const argv = require('yargs')
         Promise.all(discoverByIds(uuids)).then(devices => {
           console.log('Discovered all devices!');
           for (var thingy of devices) {
-            events(argv.apiRoot).onDiscover(thingy, argv.enableSse);
+            events(argv.apiRoot, argv.header).onDiscover(thingy, argv.enableSse);
           }
         });
     })
     .command('discover', 'discover all devices and connect to <api-root>', builder, (argv) => {
         Thingy.discoverAll(function (thingy){
             console.log('Discovered: ' + thingy);
-            events(argv.apiRoot).onDiscover(thingy, {enableEventSource: argv.enableSse})}
-        );
+            events(argv.apiRoot, argv.header).onDiscover(thingy, {enableEventSource: argv.enableSse})
+        });
     })
     .help()
     .argv

@@ -2,8 +2,9 @@
 var rest = require('restler');
 var EventSource = require('eventsource');
 
-module.exports = function(base_uri) {
+module.exports = function(base_uri, headers = {}) {
 	var module = {};
+	var options = {headers : headers};
 
 	module.logResponse = function (data, response) {
 		// parsed response body as js object
@@ -15,7 +16,7 @@ module.exports = function(base_uri) {
 	function sendSensorData (data) {
 		var jsonDate = (new Date()).toJSON();
 		var jsonData = { timestamp: jsonDate, sensors: data };
-		return rest.postJson(base_uri +'/'+this.id+'/sensors/', jsonData);
+		return rest.postJson(base_uri +'/'+this.id+'/sensors/', jsonData, options);
 	}
 
 	module.sendTemperature = function (temperature) {
@@ -39,19 +40,19 @@ module.exports = function(base_uri) {
 	};
 
 	module.setButton = function (state) {
-		return rest.putJson(base_uri +'/'+this.id+'/sensors/button', {state: state});
+		return rest.putJson(base_uri +'/'+this.id+'/sensors/button', {state: state}, options);
 	};
 
 	module.getSettings = function () {
-		return rest.get(base_uri+'/'+this.id+'/setup');
+		return rest.get(base_uri+'/'+this.id+'/setup', options);
 	};
 
 	module.getLed = function () {
-		return rest.get(base_uri+'/'+this.id+'/actuators/led');
+		return rest.get(base_uri+'/'+this.id+'/actuators/led', options);
 	};
 
 	module.getLedSource = function (onmessage, onerror) {
-		var source = new EventSource(base_uri+'/'+this.id+'/actuators/led');
+		var source = new EventSource(base_uri+'/'+this.id+'/actuators/led', options);
 		source.onmessage = onmessage;
 		if (onerror) source.onerror = onerror;
 	}
